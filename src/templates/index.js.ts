@@ -20,7 +20,7 @@ export default function (api: Api): string {
   }
 
   s.multiline(`var popsicle = require('popsicle')
-var extend = require('xtend')
+var extend = require('deep-extend')
 var setprototypeof = require('setprototypeof')
 
 var TEMPLATE_REGEXP = /\\{([^\\{\\}]+)\\}/g
@@ -71,6 +71,7 @@ function Client (options) {
 
   createThisResources(withParams, noParams, 'client', '')
 
+  s.line(`  this._client=client;`)
   s.line(`  setprototypeof(client, this)`)
   s.line(`  return client`)
   s.line(`}`)

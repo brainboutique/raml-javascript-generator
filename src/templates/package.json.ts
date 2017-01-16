@@ -27,7 +27,7 @@ export default function (api: Api) {
     homepage: 'https://github.com/mulesoft/raml-javascript-generator',
     dependencies: {
       'client-oauth2': hasSecurity(api, 'OAuth 2.0') ? '^2.1.0' : undefined,
-      'xtend': '^4.0.1',
+      'deep-extend': '^0.4.1',
       'popsicle': '^5.0.0',
       'setprototypeof': '^1.0.1'
     }

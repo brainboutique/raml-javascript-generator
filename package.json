@@ -40,8 +40,11 @@
   },
   "homepage": "https://github.com/mulesoft-labs/raml-javascript-generator",
   "devDependencies": {
+    "@types/core-js": "^0.9.35",
+    "@types/node": "^4.0.30",
     "blue-tape": "^0.2.0",
     "browserify": "^13.0.0",
+    "clone": "^2.1.0",
     "envify": "^3.4.0",
     "express": "^4.12.3",
     "istanbul": "^1.0.0-alpha.2",
@@ -50,12 +53,13 @@
     "sinon": "^1.16.1",
     "tap-spec": "^4.1.1",
     "tape-run": "^2.1.0",
-    "typescript": "^1.8.9",
+    "typescript": "^2.1.5",
     "typings": "^0.7.9"
   },
   "dependencies": {
     "camel-case": "^1.2.2",
     "javascript-stringify": "^1.0.2",
+    "json-schema-to-typescript": "^3.1.0",
     "param-case": "^1.1.2",
     "pascal-case": "^1.1.2",
     "raml-generator": "^1.0.0-3",

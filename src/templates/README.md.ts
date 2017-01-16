@@ -12,6 +12,7 @@ export default function (api: Api) {
   const s = new Strands()
   const projectName = paramCase(api.title)
   const className = pascalCase(api.title)
+  const clientName = camelCase(api.title)
 
   s.multiline(`# ${api.title}
 
@@ -25,10 +26,17 @@ npm install ${projectName} --save
 
 ## Usage
 
+### JS
 \`\`\`js
 var ${className} = require('${projectName}')
 
 var client = new ${className}()
+\`\`\`
+
+### TypeScript
+\`\`\`ts
+import * as ${className} from '${projectName}';
+this.${clientName} = new ${className}({});
 \`\`\`
 `)
 

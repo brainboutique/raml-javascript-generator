@@ -5,6 +5,7 @@ import installTemplate from './templates/INSTALL.md'
 import packageTemplate from './templates/package.json'
 import readmeTemplate from './templates/README.md'
 import indexTemplate from './templates/index.js'
+import typesTemplate from './templates/types'
 
 export const client = generator({
   templates: {
@@ -12,6 +13,7 @@ export const client = generator({
     'INSTALL.md': installTemplate,
     'package.json': packageTemplate,
     'README.md': readmeTemplate,
-    'index.js': indexTemplate
+    'index.js': indexTemplate,
+    'types.ts': typesTemplate
   }
 })
