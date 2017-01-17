@@ -26,7 +26,7 @@ export default function (api: Api) {
       s.line("//========================================================================");
       s.line("// Schema '"+schemaLogicalName+"'");
       s.line("//========================================================================");
-      s.line('export module '+schemaClassName+" {");
+      s.line('export namespace '+schemaClassName+" {");
 
 
     // "Hack": "title" attribute is used to source the sub-type name. Make sure the root element matches the outer "module" declarationn for sake of consistency

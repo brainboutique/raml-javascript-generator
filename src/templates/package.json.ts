@@ -29,7 +29,8 @@ export default function (api: Api) {
       'client-oauth2': hasSecurity(api, 'OAuth 2.0') ? '^2.1.0' : undefined,
       'deep-extend': '^0.4.1',
       'popsicle': '^5.0.0',
-      'setprototypeof': '^1.0.1'
+      'setprototypeof': '^1.0.1',
+      "rxjs": "^5.0.0-beta.12"
     }
   }, null, 2) + '\n'
 }

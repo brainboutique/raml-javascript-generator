@@ -86,6 +86,7 @@ export interface NestedMethod {
   id: string
   method: string
   headers: any
+  responseSchemas: {[responseCode: string]: string}
 }
 
 /**
@@ -109,11 +110,18 @@ export function nestedResources (api: any): NestedResource {
       if (child.methods) {
         // Push existing methods onto the active segment.
         for (const method of child.methods) {
-          node.methods.push({
+          var m:NestedMethod={
             id: methodId(),
             method: method.method,
-            headers: method.headers
+            headers: method.headers,
+            responseSchemas:{}
+          };
+
+          Object.keys(method.responses||{}).forEach((responseCode:any)=>{
+             var responseInfo=method.responses[responseCode].body||{};
+             m.responseSchemas[responseCode]=(responseInfo['application/json']||{}).schema
           })
+          node.methods.push(m);
         }
       }
 

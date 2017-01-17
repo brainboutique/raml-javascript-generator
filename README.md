@@ -1,3 +1,4 @@
+# WORK IN PROGRESS
 # RAML JavaScript Generator
 
 [![NPM version][npm-image]][npm-url]
@@ -5,7 +6,7 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-> Generate a JavaScript API client from RAML.
+> Generate a JavaScript API client from RAML. Expose defined "schemas" as Typescript interfaces resp. types.
 
 ## Installation
 
