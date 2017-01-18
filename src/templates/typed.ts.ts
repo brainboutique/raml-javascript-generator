@@ -115,7 +115,7 @@ import {Observable} from 'rxjs/Observable';
   const supportedSecuritySchemes = getSecuritySchemes(api).filter(x => x.type === 'OAuth 2.0')
 
   if (hasSecurity(api, 'OAuth 2.0')) {
-    s.line(`var ClientOAuth2 = require('client-oauth2')`)
+    s.line(`import * as ClientOAuth2 from 'client-oauth2'`)
   }
 
   s.line("//========================================================================");
@@ -136,14 +136,21 @@ function template(string, interpolate) {
   })
 }  
 
- export class Client {
+ export class ${className} {
   _client: any;
   _path: string;
   _options: any;
   _form: any;
   _version: any;
   _Security: any;
-  constructor(options:any) {
+
+  // RAML resources without parameters
+`);
+
+  createThisResourcesNoParams(withParams, noParams, 'this', '', 'Resources.')
+
+  s.multiline(`
+  constructor(options?:any) {
     this._path = ''
     this._options = extend({
       baseUri: ${stringify(api.baseUri)},
@@ -153,9 +160,12 @@ function template(string, interpolate) {
     //function client (method, path, options) {
     //  return this.request(client, method, path, options)
     //}
+    
+    // Initialize RAML resourcs without parameters
 `);
 
-  createThisResourcesWithParams(withParams, noParams, 'client', '', '')
+  createThisResourcesNoParamsInitialization(withParams, noParams, 'this', '', 'Resources.')
+  //createThisResourcesWithParams(withParams, noParams, 'client', '', '')
 
   s.line(`    this._client=this;`)
   s.line(`// TODO    setprototypeof(client, this)`)
@@ -173,8 +183,10 @@ function template(string, interpolate) {
   })
 
   s.multiline(`
-    }`);
-  createThisResourcesWithParams(withParams, noParams, 'client', '', '')
+    }
+  // RAML resources with parameters
+  `);
+  createThisResourcesWithParams(withParams, noParams, 'this', '', 'Resources.')
   s.multiline(`
 }
 
@@ -185,7 +197,7 @@ function template(string, interpolate) {
   var reqOpts = {
     url: baseUri.replace(/\\/$/, '') + template(path, options.uriParameters),
     method: method,
-    headers: options.headers,
+    headers: extend(options.headers, options.getHeaders ? options.getHeaders() : {}),
     body: options.body,
     query: options.query,
     options: options.options
@@ -229,7 +241,6 @@ function template(string, interpolate) {
   createProtoResources(withParams, noParams, 'Client', 'Resources.')
 
 
-  s.line("  //## END protoResources");
   createProtoMethods(nestedTree.methods, 'Client', 'this', `''`, 'Resources.')
   s.line("}");
 
@@ -248,7 +259,7 @@ function template(string, interpolate) {
   function createProtoMethods(methods: NestedMethod[], id: string, _client: string, _path: string, idPrefix: string) {
     for (const method of methods) {
       const headers = getDefaultParameters(method.headers)
-      const type = isQueryMethod(method) ? 'query' : 'body'
+      //const type = isQueryMethod(method) ? 'query' : 'body'
 
       var schemasData:string="{headers:any,responseCode:number, bodyRaw:any";
       Object.keys(method.responseSchemas).forEach(responseCode => {
@@ -262,18 +273,69 @@ function template(string, interpolate) {
       })
       schemasData+="}";
 
+
+      // Assemble query parameters
+      var queryParamsSignatureMandatory:string="";
+      var queryParamsSignatureOptional:string="";
+      var paramsInjection:string[]=[];
+      if (method.queryParameters) Object.keys(method.queryParameters).forEach((parameterName:string) => {
+        var param=method.queryParameters[parameterName];
+        var tmp=parameterName
+        if (!param.required)
+           tmp+="?";
+        switch (param.type) {
+          case "integer":
+            tmp += ":number";
+            break;
+          case "boolean":
+            tmp += ":" + param.type;
+            break;
+          default:
+            tmp += ":string";
+        }
+        if (!param.required)
+          queryParamsSignatureOptional+=tmp+", "
+        else
+          queryParamsSignatureMandatory+=tmp+", "
+
+        if (param.minimum)
+          paramsInjection.push("if ("+parameterName+" !== undefined && "+parameterName+" < "+param.minimum+") { observer.error('Parameter \\'"+parameterName+"\\' outside specified range!'); return;}");
+        if (param.maximum)
+          paramsInjection.push("if ("+parameterName+" !== undefined && "+parameterName+" > "+param.maximum+") { observer.error('Parameter \\'"+parameterName+"\\' outside specified range!'); return;}");
+
+        paramsInjection.push("if ("+parameterName+" !== undefined && "+parameterName+" !== null) options.query."+parameterName+"="+parameterName+";");
+      });
+
+      // Assemble body parameter
+      var bodyParam:string="";
+      var bodyParamInjection:string[]=[];
+      if (!isQueryMethod(method) && method.body) {
+        bodyParam+="body"; // TODO Check: Optional body parameter?  + (!method.body.required ? "?" : "")
+        if (method.body['application/json'] && method.body['application/json'].schema) {
+          var schemaName:string=pascalCase(method.body['application/json'].schema);
+          bodyParam += ":"+schemaName+"."+schemaName+", "; // FIXME once name hierarchy improved
+        }
+        else
+          bodyParam+=":any, "
+        paramsInjection.push("options.body=body;");
+      }
+
+
       s.line(`  /**`);
       s.line(`   * ${method.method.toUpperCase()} on ${id} - ` + JSON.stringify(method.responseSchemas));
       s.line(`   */`);
-      s.line(`  ${method.method.toUpperCase()}(${type}?:{[key: string] : string}, opts?:any):Observable<` + schemasData + `> {`)
+      s.line(`  ${method.method.toUpperCase()}(${queryParamsSignatureMandatory}${bodyParam}${queryParamsSignatureOptional}opts?:any):Observable<` + schemasData + `> {`)
       s.line(`    return Observable.create((observer) => {`);
-      s.line(`       var options = extend({ ${type}: ${type}, headers: ${stringify(headers)} }, opts)`)
+      s.line(`       var options = extend({query:{}, headers: ${stringify(headers)} }, opts)`)
+      paramsInjection.forEach((l)=>{
+        s.line(`       `+l);
+      });
       s.line(`       this._client.request(${_client}, ${stringify(method.method)}, ${_path}, options)`)
       s.line(`         .use(popsicle.plugins.parse('json'))`)
       s.line(`         .then(response => {`)
       s.line(`             var r={headers:response.headers,responseCode:response.status,bodyRaw:response.body};`);
-      s.line(`             r["_"+response.status]=response.body; console.log("###Got ",r);`);
-      s.line(`             observer.next(r);`);
+      s.line(`             r["_"+response.status]=response.body; `);
+      s.line(`             observer.next(r);observer.complete()`);
       s.line(`      })`)
       s.line(`    })`)
       s.line(`  }`)
@@ -300,29 +362,38 @@ function template(string, interpolate) {
   }
 
   function toParamsFunction(child: NestedResource, _client: string, _prefix: string, idPrefix: string) {
-    return `(uriParams) { return new ${idPrefix}${child.id}(${_client}, ${_prefix}template(${stringify(child.relativeUri)}, extend(${stringify(getDefaultParameters(child.uriParameters))}, uriParams))) }`
+    return `(uriParams:any) { return new ${idPrefix}${child.id}(${_client}, ${_prefix}template(${stringify(child.relativeUri)}, extend(${stringify(getDefaultParameters(child.uriParameters))}, uriParams))) }`
   }
+
+  function toParamsFunctionSingle(parameterName:string, child: NestedResource, _client: string, _prefix: string, idPrefix: string) {
+    return `(${parameterName}:string) { return new ${idPrefix}${child.id}(${_client}, ${_prefix}template(${stringify(child.relativeUri)}, extend(${stringify(getDefaultParameters(child.uriParameters))}, {${parameterName}:${parameterName}}))) }`
+  }
+
 
   // Create prototype resources.
   function createProtoResources(withParams: KeyedNestedResources, noParams: KeyedNestedResources, id: string, idPrefix: string) {
+    //console.log("###No params skip: "+Object.keys(withParams), "### Without: ",noParams);
     for (const key of Object.keys(withParams)) {
       const child = withParams[key]
+      //console.log("###",key);
 
       // Skip inlined entries.
       if (noParams[key] != null) {
+        console.log("No params skip: "+key)
         continue
       }
 
       s.line(`// createProtoResources - Resource: ${id}`);
-      s.line(`${child.methodName}${toParamsFunction(child, 'this._client', 'this._path + ', idPrefix)}`)
+      s.line(`${child.methodName}${toParamsFunctionSingle(key,child, 'this._client', 'this._path + ', idPrefix)}`)
+      // LEGACY STYLE: s.line(`${child.methodName}${toParamsFunction(child, 'this._client', 'this._path + ', idPrefix)}`)
     }
   }
 
   // Create nested resource instances.
   function createResource(resource: NestedResource, idPrefix: string) {
     const {withParams, noParams} = separateChildren(resource)
-    s.line(`// createResource - ${resource.id}`);
 
+    s.line(`// createResource - ${resource.id}`);
     s.line(`export class ${resource.id} { `);
     s.line(`  _client: any; _path: string;`);
     createThisResourcesNoParams(withParams, noParams, 'this._client', 'this._path + ', idPrefix)

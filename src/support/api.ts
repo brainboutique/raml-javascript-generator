@@ -86,7 +86,9 @@ export interface NestedMethod {
   id: string
   method: string
   headers: any
+  queryParameters: {[name:string]:any};
   responseSchemas: {[responseCode: string]: string}
+  body: any
 }
 
 /**
@@ -113,6 +115,8 @@ export function nestedResources (api: any): NestedResource {
           var m:NestedMethod={
             id: methodId(),
             method: method.method,
+            queryParameters: method.queryParameters,
+            body: method.body,
             headers: method.headers,
             responseSchemas:{}
           };

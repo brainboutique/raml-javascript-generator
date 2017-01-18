@@ -69,6 +69,7 @@ function Client (options) {
   }
 `)
 
+  s.line("// ### ctr 1");
   createThisResources(withParams, noParams, 'client', '')
 
   s.line(`  this._client=client;`)
@@ -184,6 +185,7 @@ function Client (options) {
     s.line(`  this._client = client`)
     s.line(`  this._path = path`)
 
+    s.line("// ### ctr 2");
     createThisResources(withParams, noParams, 'this._client', 'this._path + ')
 
     s.line(`}`)
@@ -206,6 +208,8 @@ function Client (options) {
       const constructor = `new ${child.id}(${_client}, ${_prefix}${stringify(child.relativeUri)})`
 
       if (withParams[key] == null) {
+        s.line("// ### createProtoResources");
+
         s.line(`  this.${child.methodName} = ${constructor}`)
       } else {
         s.line(`  this.${child.methodName} = setprototypeof(${toParamsFunction(withParams[key], _client, _prefix)}, ${constructor})`)
