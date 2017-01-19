@@ -282,7 +282,8 @@ function template(string, interpolate) {
       var paramsInjection:string[]=[];
       if (method.queryParameters) Object.keys(method.queryParameters).forEach((parameterName:string) => {
         var param=method.queryParameters[parameterName];
-        var tmp=parameterName
+        var parameterJSName:string=camelCase(parameterName);
+        var tmp=parameterJSName
         if (!param.required)
            tmp+="?";
         switch (param.type) {
@@ -301,11 +302,11 @@ function template(string, interpolate) {
           queryParamsSignatureMandatory+=tmp+", "
 
         if (param.minimum)
-          paramsInjection.push("if ("+parameterName+" !== undefined && "+parameterName+" < "+param.minimum+") { observer.error('Parameter \\'"+parameterName+"\\' outside specified range!'); return;}");
+          paramsInjection.push("if ("+parameterJSName+" !== undefined && "+parameterJSName+" < "+param.minimum+") { observer.error('Parameter \\'"+parameterJSName+"\\' outside specified range!'); return;}");
         if (param.maximum)
-          paramsInjection.push("if ("+parameterName+" !== undefined && "+parameterName+" > "+param.maximum+") { observer.error('Parameter \\'"+parameterName+"\\' outside specified range!'); return;}");
+          paramsInjection.push("if ("+parameterJSName+" !== undefined && "+parameterJSName+" > "+param.maximum+") { observer.error('Parameter \\'"+parameterJSName+"\\' outside specified range!'); return;}");
 
-        paramsInjection.push("if ("+parameterName+" !== undefined && "+parameterName+" !== null) options.query."+parameterName+"="+parameterName+";");
+        paramsInjection.push("if ("+parameterJSName+" !== undefined && "+parameterJSName+" !== null) options.query['"+parameterName+"']="+parameterJSName+";");
       });
 
       // Assemble body parameter

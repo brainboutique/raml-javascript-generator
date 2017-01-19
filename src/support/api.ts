@@ -142,17 +142,11 @@ export function nestedResources (api: any): NestedResource {
       var id:string=(node.id == "Resource0" ? "" : node.id) +pascalCase(key.replace(/^[a-zA-Z]/g,""));
       if (keyUniqueness[id]!=undefined)
       {
-        //console.log("### Child for "+key+" later");
-        if (key=="/{tenant}") console.error("Tenant first")
         id=keyUniqueness[id](); // In case this ID was already used, replace with unique'd version.
       }
       else {
-//        console.log("### Child for "+key+" FIRST "+id);
-        if (key=="/{tenant}") console.error("Tenant SECOND")
         keyUniqueness[id] = uniqueId(id);
       }
-      //id=resourceId();
-      console.log("### "+id);
       childResource = node.children[key] = {
         id: id, //resourceId(),
         methodName: toMethodName(key),
