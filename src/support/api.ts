@@ -1,5 +1,6 @@
 import extend = require('xtend')
 import uniqueId = require('uniqueid')
+import pascalCase = require('pascal-case')
 
 import { getUsedUriParameters, toMethodName } from './resource'
 
@@ -97,6 +98,7 @@ export interface NestedMethod {
 export function nestedResources (api: any): NestedResource {
   const methodId = uniqueId('Method')
   const resourceId = uniqueId('Resource')
+  var keyUniqueness:{[id:string]:(()=>string)}={};
 
   const resource: NestedResource = {
     id: resourceId(),
@@ -137,8 +139,22 @@ export function nestedResources (api: any): NestedResource {
     let childResource = key === '/' ? node : node.children[key]
 
     if (childResource == null) {
+      var id:string=(node.id == "Resource0" ? "" : node.id) +pascalCase(key.replace(/^[a-zA-Z]/g,""));
+      if (keyUniqueness[id]!=undefined)
+      {
+        //console.log("### Child for "+key+" later");
+        if (key=="/{tenant}") console.error("Tenant first")
+        id=keyUniqueness[id](); // In case this ID was already used, replace with unique'd version.
+      }
+      else {
+//        console.log("### Child for "+key+" FIRST "+id);
+        if (key=="/{tenant}") console.error("Tenant SECOND")
+        keyUniqueness[id] = uniqueId(id);
+      }
+      //id=resourceId();
+      console.log("### "+id);
       childResource = node.children[key] = {
-        id: resourceId(),
+        id: id, //resourceId(),
         methodName: toMethodName(key),
         children: {},
         methods: [],

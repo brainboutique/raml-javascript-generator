@@ -37,6 +37,11 @@ var jsGenerator = require('raml-javascript-generator')
 var output = jsGenerator(/* api, data */)
 ```
 
+## Limitations
+* Used schema generator does not (yet) support $ref external references
+* Only explicitly named schemas are exposed via type or interface
+ 
+
 ## License
 
 Apache License 2.0

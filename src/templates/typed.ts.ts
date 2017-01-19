@@ -168,7 +168,7 @@ function template(string, interpolate) {
   //createThisResourcesWithParams(withParams, noParams, 'client', '', '')
 
   s.line(`    this._client=this;`)
-  s.line(`// TODO    setprototypeof(client, this)`)
+  //s.line(`// TODO    setprototypeof(client, this)`)
   s.line(`    this._form = popsicle.form`)
   s.line(`    this._version = ${stringify(api.version)}`)
   s.line('    this._Security = {')
@@ -267,6 +267,8 @@ function template(string, interpolate) {
         if (schema && !schema.startsWith("{")) {
           var schemaType = pascalCase(schema);
           schemasData+=',"_'+responseCode+'"?:'+schemaType+"."+schemaType; // FIXME: Update once namespace improvement in place, see above
+        } else if (schema) {
+          schemasData+=',"'+responseCode+'":any  /* Implicitly defined schemas not yet supported */';
         }
         else
           schemasData+=',"'+responseCode+'":any';
@@ -312,8 +314,15 @@ function template(string, interpolate) {
       if (!isQueryMethod(method) && method.body) {
         bodyParam+="body"; // TODO Check: Optional body parameter?  + (!method.body.required ? "?" : "")
         if (method.body['application/json'] && method.body['application/json'].schema) {
-          var schemaName:string=pascalCase(method.body['application/json'].schema);
-          bodyParam += ":"+schemaName+"."+schemaName+", "; // FIXME once name hierarchy improved
+          var schema:string=method.body['application/json'].schema;
+          // TODO: Handle implicitly defined body schema
+          if (!schema.startsWith("{")) {
+            var schemaName: string = pascalCase(method.body['application/json'].schema);
+            bodyParam += ":" + schemaName + "." + schemaName + ", "; // FIXME once name hierarchy improved
+          }
+          else {
+            bodyParam+=":any /* Implicitly defined schemas not yet supported */, "
+          }
         }
         else
           bodyParam+=":any, "
@@ -322,7 +331,7 @@ function template(string, interpolate) {
 
 
       s.line(`  /**`);
-      s.line(`   * ${method.method.toUpperCase()} on ${id} - ` + JSON.stringify(method.responseSchemas));
+      s.line(`   * ${method.method.toUpperCase()} on ${id}`);// - ` + JSON.stringify(method.responseSchemas));
       s.line(`   */`);
       s.line(`  ${method.method.toUpperCase()}(${queryParamsSignatureMandatory}${bodyParam}${queryParamsSignatureOptional}opts?:any):Observable<` + schemasData + `> {`)
       s.line(`    return Observable.create((observer) => {`);
@@ -459,8 +468,8 @@ function template(string, interpolate) {
       const constructor = `new ${idPrefix}${child.id}(${_client}, ${_prefix}${stringify(child.relativeUri)})`
 
       if (withParams[key] == null) {
-        s.line(`  // TODO createThisResourcesNoParams - ` + key);
-        s.line(`  /* ` + JSON.stringify(child) + "*/");
+        //s.line(`  // TODO createThisResourcesNoParams - ` + key);
+        //s.line(`  /* ` + JSON.stringify(child) + "*/");
         s.line(`  this.${child.methodName} = ${constructor}`)
       }
     }
