@@ -261,17 +261,21 @@ function template(string, interpolate) {
       const headers = getDefaultParameters(method.headers)
       //const type = isQueryMethod(method) ? 'query' : 'body'
 
+      var returnsJSON:boolean=false;
+
       var schemasData:string="{headers:any,responseCode:number, bodyRaw:any";
       Object.keys(method.responseSchemas).forEach(responseCode => {
         var schema: string = method.responseSchemas[responseCode];
+        if (schema)
+          returnsJSON=true;
         if (schema && !schema.startsWith("{")) {
           var schemaType = pascalCase(schema);
           schemasData+=',"_'+responseCode+'"?:'+schemaType+"."+schemaType; // FIXME: Update once namespace improvement in place, see above
         } else if (schema) {
-          schemasData+=',"'+responseCode+'":any  /* Implicitly defined schemas not yet supported */';
+          schemasData+=',"_'+responseCode+'":any  /* Implicitly defined schemas not yet supported */';
         }
         else
-          schemasData+=',"'+responseCode+'":any';
+          schemasData+=',"_'+responseCode+'":any';
       })
       schemasData+="}";
 
@@ -341,7 +345,9 @@ function template(string, interpolate) {
         s.line(`       `+l);
       });
       s.line(`       this._client.request(${_client}, ${stringify(method.method)}, ${_path}, options)`)
-      s.line(`         .use(popsicle.plugins.parse('json'))`)
+      if (returnsJSON) {
+        s.line(`         .use(popsicle.plugins.parse('json'))`)
+      }
       s.line(`         .then(response => {`)
       s.line(`             var r={headers:response.headers,responseCode:response.status,bodyRaw:response.body};`);
       s.line(`             r["_"+response.status]=response.body; `);
