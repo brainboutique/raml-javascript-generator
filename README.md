@@ -1,4 +1,3 @@
-# WORK IN PROGRESS
 # RAML JavaScript Generator
 
 [![NPM version][npm-image]][npm-url]
@@ -6,8 +5,12 @@
 [![Build status][travis-image]][travis-url]
 [![Test coverage][coveralls-image]][coveralls-url]
 
-> Generate a JavaScript API client from RAML. Expose defined "schemas" as Typescript interfaces resp. types.
+> Generate a TypeScript (Angular2, Ionic2 or similar) JavaScript API client from RAML. Expose defined "schemas" as Typescript interfaces resp. types. 
+- Allows developers to take advantage of clean API specification already at compile time.
+- Reduces chance of misinterpretation of REST actions and exchanged payloads
+- Eases API version updates as breaking changes should surface immediately and not only at runtime.  
 
+Note: Generator based on library provided by MuleSoft.
 ## Installation
 
 ```

@@ -55,7 +55,6 @@ export default function (api: Api) {
   s.multiline(`
 import * as popsicle from 'popsicle';
 import * as extend from 'deep-extend';
-import * as setprototypeof from 'setprototypeof';
 import {Observable} from 'rxjs/Observable';
 
 `);
