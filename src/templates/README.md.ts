@@ -16,7 +16,9 @@ export default function (api: Api) {
 
   s.multiline(`# ${api.title}
 
-> Browser and node module for making API requests against [${api.title}](${api.baseUri}).
+> TypeScript abstraction library for RAML-based REST API [${api.title}](${api.baseUri}).
+
+Auto-generated using [raml-typescript-generator](https://github.com/brainboutique/raml-typescript-generator). 
 
 ## Installation
 
@@ -26,17 +28,21 @@ npm install ${projectName} --save
 
 ## Usage
 
-### JS
-\`\`\`js
-var ${className} = require('${projectName}')
-
-var client = new ${className}()
-\`\`\`
-
 ### TypeScript
 \`\`\`ts
-import * as ${className} from '${projectName}';
-this.${clientName} = new ${className}({});
+import ${className} from '${projectName}';
+...
+constructor(..) {
+  this.${clientName} = new ${className}({});
+}
+\`\`\`
+
+### JS (Legacy)
+API skeleton as it would be produced by MuleSoft's [raml-javascript-generator](https://github.com/mulesoft-labs/raml-javascript-generator) JS generator is shipped for reference and to ease migrations:
+\`\`\`js
+var ${className} = require('${projectName}/leagcy.js')
+
+var client = new ${className}()
 \`\`\`
 `)
 
@@ -44,6 +50,7 @@ this.${clientName} = new ${className}({});
     s.multiline(`### Authentication
 
 #### OAuth 2.0
+(!) Feature ported from legacy raml-javascript-generator but not yet finalized! You are on your own here...
 
 This API supports authentication with [OAuth 2.0](https://github.com/mulesoft/js-client-oauth2). Initialize the \`OAuth2\` instance with the application client id, client secret and a redirect uri to authenticate with users.
 
@@ -70,33 +77,41 @@ var auth = new ${className}.security.<method>({
 You can set options when you initialize a client or at any time with the \`options\` property. You may also override options per request by passing an object as the last argument of request methods. For example:
 
 \`\`\`javascript
-var client = new ${className}({ ... })
+client = new ${className}({ ... })
 
 client('GET', '/', {
-  baseUri: 'http://example.com',
+  baseUri: '${api.baseUri ? api.baseUri.replace(/\/[^/]*$/,"/anotherVersion") : "https://example.com"}',
   headers: {
     'Content-Type': 'application/json'
   }
 })
 \`\`\`
 
+For dynamic header injection - for example required for non-standard REST services asking for custom authentication token - a provider may be defined:
+
+\`\`\`javascript
+client = new ${className}({
+  getHeaders: ()=>{ return(this.myToken ? {Authorization: "Bearer " + this.myToken} : {}) }
+});
+\`\`\`
+
 #### Base URI
+By default, endpoint as defined in RAML file \`${api.baseUri}\` is used.
+
+**Note** If supported by API provider, it is recommended to use one API version definition (i.e. RAML file and corresponding API TypeScript library) and switch endpoint based on the desired environment, for example \`test\`, \`qa\` or \`prod\`
 
 You can override the base URI by setting the \`baseUri\` property, or initializing a client with a base URI. For example:
 
 \`\`\`javascript
 new ${className}({
-  baseUri: 'https://example.com'
+  baseUri: '${api.baseUri ? api.baseUri.replace(/\/[^/]*$/,"/anotherVersion") : "https://example.com"}',
 });
 \`\`\`
 
-### Helpers
-
-Exports \`${className}.form\`, which exposes a cross-platform \`FormData\` interface that can be used with request bodies.
 
 ### Methods
 
-All methods return a HTTP request instance of [Popsicle](https://github.com/blakeembrey/popsicle), which allows the use of promises (and streaming in node).
+All methods return an Observable wrapping a [Popsicle](https://github.com/blakeembrey/popsicle) obtained response:
 `)
 
   for (const resource of allResources(api)) {

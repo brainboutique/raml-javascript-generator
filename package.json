@@ -1,14 +1,14 @@
 {
-  "name": "raml-javascript-generator",
-  "version": "1.0.0-0",
-  "description": "Generate a JavaScript API client from RAML",
-  "main": "raml-javascript-generator.js",
+  "name": "raml-typescript-generator",
+  "version": "1.1.0-0",
+  "description": "Generate a TypeScript API client from RAML",
+  "main": "dist/bin.js",
   "files": [
     "dist/",
     "LICENSE"
   ],
   "bin": {
-    "raml-javascript-generator": "dist/bin.js"
+    "raml-typescript-generator": "dist/bin.js"
   },
   "scripts": {
     "lint": "# tslint \"src/**/*.ts\"",
@@ -33,18 +33,17 @@
     "javascript",
     "interface"
   ],
-  "author": "MuleSoft, Inc.",
+  "author": "Wilko Hein @ BrainBoutique",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/mulesoft-labs/raml-javascript-generator/issues"
+    "url": "https://github.com/brainboutique/raml-typescript-generator/issues"
   },
-  "homepage": "https://github.com/mulesoft-labs/raml-javascript-generator",
+  "homepage": "https://github.com/brainboutique/raml-typescript-generator",
   "devDependencies": {
     "@types/core-js": "^0.9.35",
     "@types/node": "^4.0.30",
     "blue-tape": "^0.2.0",
     "browserify": "^13.0.0",
-    "clone": "^2.1.0",
     "envify": "^3.4.0",
     "express": "^4.12.3",
     "istanbul": "^1.0.0-alpha.2",
@@ -58,6 +57,7 @@
   },
   "dependencies": {
     "camel-case": "^1.2.2",
+    "clone": "^2.1.0",
     "javascript-stringify": "^1.0.2",
     "json-schema-to-typescript": "^3.1.0",
     "param-case": "^1.1.2",
