@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mulesoft-labs/raml-javascript-generator.git"
+    "url": "git://github.com/brainboutique/raml-typescript-generator.git"
   },
   "keywords": [
     "raml",
@@ -33,7 +33,7 @@
     "javascript",
     "interface"
   ],
-  "author": "Wilko Hein @ BrainBoutique",
+  "author": "Wilko Hein",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/brainboutique/raml-typescript-generator/issues"
