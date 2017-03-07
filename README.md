@@ -2,8 +2,6 @@
 
 [![NPM version][npm-image]][npm-url]
 [![NPM downloads][downloads-image]][downloads-url]
-[![Build status][travis-image]][travis-url]
-[![Test coverage][coveralls-image]][coveralls-url]
 
 > Generate a TypeScript (Angular2, Ionic2 or similar) JavaScript API client from RAML. Expose defined "schemas" as Typescript interfaces resp. types. 
 - Allows developers to take advantage of clean API specification already at compile time.
@@ -100,11 +98,7 @@ GET(  totalCount:boolean,
 
 Apache License 2.0
 
-[npm-image]: https://img.shields.io/npm/v/raml-javascript-generator.svg?style=flat
-[npm-url]: https://npmjs.org/package/raml-javascript-generator
-[downloads-image]: https://img.shields.io/npm/dm/raml-javascript-generator.svg?style=flat
-[downloads-url]: https://npmjs.org/package/raml-javascript-generator
-[travis-image]: https://img.shields.io/travis/mulesoft-labs/raml-javascript-generator.svg?style=flat
-[travis-url]: https://travis-ci.org/mulesoft-labs/raml-javascript-generator
-[coveralls-image]: https://img.shields.io/coveralls/mulesoft-labs/raml-javascript-generator.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/mulesoft-labs/raml-javascript-generator?branch=master
+[npm-image]: https://img.shields.io/npm/v/raml-typescript-generator.svg?style=flat
+[npm-url]: https://npmjs.org/package/raml-typescript-generator
+[downloads-image]: https://img.shields.io/npm/dm/raml-typescript-generator.svg?style=flat
+[downloads-url]: https://npmjs.org/package/raml-typescript-generator
