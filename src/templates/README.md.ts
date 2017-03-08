@@ -30,12 +30,20 @@ npm install ${projectName} --save
 
 ### TypeScript
 \`\`\`ts
-import ${className} from '${projectName}';
+import \{${className}\} from '${projectName}';
 ...
 constructor(..) {
   this.${clientName} = new ${className}({});
 }
 \`\`\`
+
+To support multiple versions of the API, it is recommended to alias the import so it can easily be mapped to a later API version - and, due to the nature of Typescript, 
+you should be alerted on API signature changes already at compile time:
+
+ \`\`\`ts
+import \{${className} as ${className.replace(/V[0-9]*$/,"")}\} from '${projectName}';
+ \`\`\`
+
 
 ### JS (Legacy)
 API skeleton as it would be produced by MuleSoft's [raml-javascript-generator](https://github.com/mulesoft-labs/raml-javascript-generator) JS generator is shipped for reference and to ease migrations:
