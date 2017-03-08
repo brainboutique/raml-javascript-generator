@@ -32,7 +32,7 @@ export default function (api: Api) {
       "compile": "tsc",
       "copyLegacy": "copyfiles -f src/*.js dist",
       "build": "npm run prepare && npm run compile && npm run copyLegacy",
-      //"prepublish": "npm run build"
+      "prepublish": "npm run build"
     },
     author: '@FIXME',
     license: 'Apache-2.0',
